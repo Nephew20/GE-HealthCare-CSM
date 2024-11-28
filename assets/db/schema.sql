@@ -1,0 +1,5 @@
+DROP DATABASE IF EXISTS ge_db;
+CREATE DATABASE ge_db;
+
+USE ge_db;
+
