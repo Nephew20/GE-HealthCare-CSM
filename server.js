@@ -1,6 +1,13 @@
 // Imports
 const inquirer = require('inquirer');
 const mysql = require('mysql2');
+const express = require('express');
+
+const app = express();
+
+// Express middleware
+app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
 
 inquirer
   .prompt([
@@ -16,14 +23,21 @@ inquirer
     const db = mysql.createConnection(
       {
         host: "localhost",
+        // Your Mysql User
         user: "root",
-        password: "12345",
+        // Your Mysql Password
+        password: "",
         database: "ge_db"
       }
     )
 
     if (answers.option == "View all departments") {
-      db.query(`SELECT * FROM departments;`)
+      db.query(`SELECT * FROM departments`, (err, result) => {
+        if (err) {
+          console.log(err)
+        }
+        console.log(result)
+      })
     }
     
     console.log(answers.option)
