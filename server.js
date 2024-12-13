@@ -15,7 +15,7 @@ inquirer
         type: 'list',
         name: "option",
         message: "Hello, What would you like to do?",
-        choices: ["View all departments", "View all employees", "Add a department", 
+        choices: ["View all departments", "View all roles", "View all employees", "Add a department", 
             "Add a role", "Add an employee", "Update an employee role"],    
     }
   ])
@@ -37,10 +37,18 @@ inquirer
           console.log(err)
         }
         console.log(result)
+        return
       })
+    } else if (answers.option == "View all roles") {
+      db.query(`SELECT roles.*, departments.name AS department_name FROM roles JOIN departments ON departments.id = roles.departments_id`, (err, result) => {
+        if (err) {
+          console.log(err)
+        }
+        console.log(result)
+      })
+      return
     }
     
-    console.log(answers.option)
   })
   .catch((error) => {
     if (error.isTtyError) {

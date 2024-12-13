@@ -7,9 +7,9 @@ VALUES  ("Emergency Department"),
 
 INSERT INTO roles(job_title, departments_id, salary)
 VALUES  ("Apprentice", 5, 45000),
-        ("BMET Technician 1", 2, 55000),
-        ("BMET Technician 2", 3, 70000),
-        ("Field Service Engineer 1", 4, 65000),
+        ("BMET Technician 1", 1, 55000),
+        ("BMET Technician 2", 4, 70000),
+        ("Field Service Engineer 1", 3, 65000),
         ("Field Service Engineer 2", 2, 80000);
 
 INSERT INTO employees(first_name, last_name, roles_id, manager)
