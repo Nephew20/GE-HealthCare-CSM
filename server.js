@@ -2,6 +2,7 @@
 const inquirer = require('inquirer');
 const mysql = require('mysql2');
 const express = require('express');
+const cTable = require('console.table')
 
 const app = express();
 
@@ -36,11 +37,19 @@ inquirer
         if (err) {
           console.log(err)
         }
-        console.log(result)
+        console.table(result)
         return
       })
     } else if (answers.option == "View all roles") {
       db.query(`SELECT roles.*, departments.name AS department_name FROM roles JOIN departments ON departments.id = roles.departments_id`, (err, result) => {
+        if (err) {
+          console.log(err)
+        }
+        console.table(result)
+      })
+      return
+    } else if (answers.option == "View all employees") {
+      db.query(``, (err, result) => {
         if (err) {
           console.log(err)
         }
