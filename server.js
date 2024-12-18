@@ -2,6 +2,8 @@
 const inquirer = require('inquirer');
 const mysql = require('mysql2');
 const express = require('express');
+
+// Convert data to a table
 const cTable = require('console.table')
 
 const app = express();
@@ -21,17 +23,19 @@ inquirer
     }
   ])
   .then((answers) => {
+    // Connection to the mysql database
     const db = mysql.createConnection(
       {
         host: "localhost",
         // Your Mysql User
         user: "root",
         // Your Mysql Password
-        password: "12345",
+        password: "",
         database: "ge_db"
       }
     )
 
+    // Query to see all departments 
     if (answers.option == "View all departments") {
       db.query(`SELECT * FROM departments`, (err, result) => {
         if (err) {
@@ -40,6 +44,7 @@ inquirer
         console.table(result)
         return
       })
+      // Query to see all roles
     } else if (answers.option == "View all roles") {
       db.query(`SELECT roles.*, departments.name AS department_name FROM roles JOIN departments ON departments.id = roles.departments_id`, (err, result) => {
         if (err) {
@@ -48,6 +53,7 @@ inquirer
         console.table(result)
       })
       return
+      // Query to see all employees
     } else if (answers.option == "View all employees") {
       db.query(`SELECT employees.id, employees.first_name, employees.last_name, roles.job_title, roles.salary, departments.name AS department_name, employees.manager AS employee_manager FROM employees JOIN roles ON roles.id = employees.roles_id JOIN departments ON departments.id = roles.departments_id`, (err, result) => {
         if (err) {
@@ -56,6 +62,31 @@ inquirer
         console.table(result)
       })
       return
+
+    } else if (answers.option == "Add a department") {
+      inquirer.prompt([
+        {
+          type: 'input',
+          name: "name",
+          message: "What is the new department?"
+        }
+      ])
+        .then((answers) => {
+          db.query(`INSERT INTO departments(name) VALUES (?);`, answers.name, (err, result) => {
+            if (err) {
+              console.log(err);
+              return
+            }
+            console.log(result)
+            db.query(`SELECT * FROM departments`, (err, result) => {
+              if (err) {
+                console.log(err)
+              }
+              console.table(result)
+            })
+
+          })
+        })
     }
 
   })
