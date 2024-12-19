@@ -91,9 +91,25 @@ function GEHealthCare() {
       } else if (answers.option == "Add a role") {
         inquirer.prompt([
           {
-            type
+            type: "input",
+            name: "job_title",
+            message: "Whate is the name of the role?"
+          },
+          {
+            type: "input",
+            name: "salary",
+            message: "How much does the role pay?"
+          },
+          {
+            type: "list",
+            name: "department",
+            message: "Which department does the role belong to?",
+            choices: ["Emergency Department", "Operating Room", "Radiology", "Cardiology", "General Patient Care",]
           }
         ])
+        .then((answers) => {
+          db.query(`INSERT INTO roles(job_title, departments_id, salary) VALUES (?,?,?);`, )
+        })
       }
       console.log("Goodbye!")
       db.end();
