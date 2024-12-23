@@ -78,7 +78,7 @@ function GEHealthCare() {
                 console.log(err);
                 return
               }
-              console.log(result)
+              console.log("Department added to the database")
               db.query(`SELECT * FROM departments`, (err, result) => {
                 if (err) {
                   console.log(err)
@@ -88,33 +88,61 @@ function GEHealthCare() {
 
             })
           })
+          //Query for adding a role to the database
       } else if (answers.option == "Add a role") {
-        inquirer.prompt([
-          {
-            type: "input",
-            name: "job_title",
-            message: "Whate is the name of the role?"
-          },
-          {
-            type: "input",
-            name: "salary",
-            message: "How much does the role pay?"
-          },
-          {
-            type: "list",
-            name: "department",
-            message: "Which department does the role belong to?",
-            choices: ["Emergency Department", "Operating Room", "Radiology", "Cardiology", "General Patient Care",]
+
+        //Gathering the departments from database
+        db.query(`SELECT id, name FROM departments`, (err, result) => {
+          if (err) {
+            console.log(err)
           }
-        ])
-        .then((answers) => {
-          db.query(`INSERT INTO roles(job_title, departments_id, salary) VALUES (?,?,?);`, )
+          //Creating a new array with the department id being assessed as a value 
+          const departmentChoices = result.map(dept => ({
+            name: dept.name,
+            value: dept.id
+          }))
+
+          inquirer.prompt([
+            {
+              type: "input",
+              name: "job_title",
+              message: "Whate is the name of the role?"
+            },
+            {
+              type: "input",
+              name: "salary",
+              message: "How much does the role pay?"
+            },
+            {
+              type: "list",
+              name: "department_id",
+              message: "Which department does the role belong to?",
+              choices: departmentChoices
+            }
+          ])
+            .then((answers) => {
+              db.query(`INSERT INTO roles(job_title, departments_id, salary) VALUES (?,?,?);`, [answers.job_title, answers.department_id, answers.salary], (err, results) => {
+                if (err) {
+                  console.log(err);
+                  return GEHealthCare()
+                }
+                console.log("Role was added to the database!")
+              })
+
+              db.query(`SELECT roles.*, departments.name AS department_name FROM roles JOIN departments ON departments.id = roles.departments_id`, (err, result) => {
+                if (err) {
+                  console.log(err)
+                }
+                console.table(result)
+              })
+              return GEHealthCare()
+            })
         })
       }
-      console.log("Goodbye!")
-      db.end();
-      
-      
+      // console.log("Goodbye!")
+      // db.end();
+
+
     })
     .catch((error) => {
       if (error.isTtyError) {
