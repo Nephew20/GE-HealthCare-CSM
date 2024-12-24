@@ -32,7 +32,7 @@ function GEHealthCare() {
           // Your Mysql User
           user: "root",
           // Your Mysql Password
-          password: "12345",
+          password: "",
           database: "ge_db"
         }
       )
@@ -127,7 +127,7 @@ function GEHealthCare() {
                   console.log(err);
                   return GEHealthCare()
                 }
-                console.log("Role was added to the database!")
+                console.log("Role added to the database!")
               })
 
               db.query(`SELECT roles.*, departments.name AS department_name FROM roles JOIN departments ON departments.id = roles.departments_id`, (err, result) => {
@@ -148,7 +148,7 @@ function GEHealthCare() {
           const employeeChoices = results.map(emp => ({
             name: emp.job_title,
             value: emp.id 
-          }))
+          }));
 
           console.log(employeeChoices)
 
@@ -176,11 +176,24 @@ function GEHealthCare() {
             }
           ])
           .then((answers) => {
-          
-          })
-          
-        })
-      }
+            db.query(`INSERT INTO employees(first_name, last_name, roles_id, manager) VALUES (?,?,?,?)`, [answers.first_name, answers.last_name, answers.roles_id, answers.manager], (err, results) => {
+              if (err) {
+                console.log(err);
+              } 
+              console.log("Employee added to the database!");
+            })
+
+            db.query(`SELECT employees.id, employees.first_name, employees.last_name, roles.job_title, employees.manager AS employee_manager FROM employees JOIN roles ON roles.id = employees.roles_id JOIN departments ON departments.id = roles.departments_id`, (err, results) => {
+              if (err) {
+                console.log(err);
+              }
+              console.table(results);
+              return GEHealthCare();
+            });
+          });
+        });
+      };
+
       // console.log("Goodbye!")
       // db.end();
 
