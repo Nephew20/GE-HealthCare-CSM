@@ -5,7 +5,6 @@ const express = require('express');
 
 // Convert data to a table
 const cTable = require('console.table');
-const { type } = require('express/lib/response');
 
 const app = express();
 
@@ -21,7 +20,7 @@ function GEHealthCare() {
         name: "option",
         message: "Hello, What would you like to do?",
         choices: ["View all departments", "View all roles", "View all employees", "Add a department",
-          "Add a role", "Add an employee", "Update an employee role", "Exit"],
+          "Add a role", "Add an employee", "Update an employee role", "Exit"]
       }
     ])
     .then((answers) => {
@@ -32,7 +31,7 @@ function GEHealthCare() {
           // Your Mysql User
           user: "root",
           // Your Mysql Password
-          password: "",
+          password: "12345",
           database: "ge_db"
         }
       )
@@ -48,13 +47,15 @@ function GEHealthCare() {
         })
         // Query to see all roles
       } else if (answers.option == "View all roles") {
-        db.query(`SELECT roles.*, departments.name AS department_name FROM roles JOIN departments ON departments.id = roles.departments_id`, (err, result) => {
+        db.query(`SELECT roles.*, departments.name AS department_name 
+          FROM roles 
+          JOIN departments ON departments.id = roles.departments_id`, (err, result) => {
           if (err) {
             console.log(err);
           }
           console.table(result);
+          return GEHealthCare();
         })
-        return GEHealthCare();
         // Query to see all employees
       } else if (answers.option == "View all employees") {
         db.query(`SELECT employees.id, employees.first_name, employees.last_name, roles.job_title, roles.salary, departments.name AS department_name, employees.manager AS employee_manager FROM employees JOIN roles ON roles.id = employees.roles_id JOIN departments ON departments.id = roles.departments_id`, (err, result) => {
@@ -62,8 +63,9 @@ function GEHealthCare() {
             console.log(err)
           }
           console.table(result)
+          return GEHealthCare();
         })
-        return GEHealthCare();
+        
         // Query to add a department
       } else if (answers.option == "Add a department") {
         inquirer.prompt([
@@ -84,12 +86,13 @@ function GEHealthCare() {
                 if (err) {
                   console.log(err)
                 }
-                console.table(result)
+                console.table(result);
+                return GEHealthCare();
               })
 
             })
           })
-          //Query for adding a role to the database
+        //Query for adding a role to the database
       } else if (answers.option == "Add a role") {
 
         //Gathering the departments from database
@@ -130,13 +133,14 @@ function GEHealthCare() {
                 console.log("Role added to the database!")
               })
 
-              db.query(`SELECT roles.*, departments.name AS department_name FROM roles JOIN departments ON departments.id = roles.departments_id`, (err, result) => {
+              db.query(`SELECT roles.id, roles.job_title, departments.name AS department_name FROM roles JOIN departments ON departments.id = roles.departments_id`, (err, result) => {
                 if (err) {
                   console.log(err)
                 }
                 console.table(result)
+                return GEHealthCare()
               })
-              return GEHealthCare()
+              
             })
         })
       } else if (answers.option == "Add an employee") {
@@ -147,7 +151,7 @@ function GEHealthCare() {
 
           const employeeChoices = results.map(emp => ({
             name: emp.job_title,
-            value: emp.id 
+            value: emp.id
           }));
 
           console.log(employeeChoices)
@@ -175,27 +179,29 @@ function GEHealthCare() {
               message: "Who is the employees manager?"
             }
           ])
-          .then((answers) => {
-            db.query(`INSERT INTO employees(first_name, last_name, roles_id, manager) VALUES (?,?,?,?)`, [answers.first_name, answers.last_name, answers.roles_id, answers.manager], (err, results) => {
-              if (err) {
-                console.log(err);
-              } 
-              console.log("Employee added to the database!");
-            })
+            .then((answers) => {
+              db.query(`INSERT INTO employees(first_name, last_name, roles_id, manager) VALUES (?,?,?,?)`, [answers.first_name, answers.last_name, answers.roles_id, answers.manager], (err, results) => {
+                if (err) {
+                  console.log(err);
+                }
+                console.log("Employee added to the database!");
+              })
 
-            db.query(`SELECT employees.id, employees.first_name, employees.last_name, roles.job_title, employees.manager AS employee_manager FROM employees JOIN roles ON roles.id = employees.roles_id JOIN departments ON departments.id = roles.departments_id`, (err, results) => {
-              if (err) {
-                console.log(err);
-              }
-              console.table(results);
-              return GEHealthCare();
+              db.query(`SELECT employees.id AS 'Employee ID ', employees.first_name, employees.last_name, roles.job_title, employees.manager AS employee_manager FROM employees JOIN roles ON roles.id = employees.roles_id JOIN departments ON departments.id = roles.departments_id`, (err, results) => {
+                if (err) {
+                  console.log(err);
+                }
+                console.table(results);
+                return GEHealthCare();
+              });
             });
-          });
-        });
-      };
+        })
+      } else {
+        console.log("Good Bye!")
+        db.end()
+      }
 
-      // console.log("Goodbye!")
-      // db.end();
+     
 
 
     })
