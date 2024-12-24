@@ -4,7 +4,8 @@ const mysql = require('mysql2');
 const express = require('express');
 
 // Convert data to a table
-const cTable = require('console.table')
+const cTable = require('console.table');
+const { type } = require('express/lib/response');
 
 const app = express();
 
@@ -31,7 +32,7 @@ function GEHealthCare() {
           // Your Mysql User
           user: "root",
           // Your Mysql Password
-          password: "",
+          password: "12345",
           database: "ge_db"
         }
       )
@@ -49,11 +50,11 @@ function GEHealthCare() {
       } else if (answers.option == "View all roles") {
         db.query(`SELECT roles.*, departments.name AS department_name FROM roles JOIN departments ON departments.id = roles.departments_id`, (err, result) => {
           if (err) {
-            console.log(err)
+            console.log(err);
           }
-          console.table(result)
+          console.table(result);
         })
-        return
+        return GEHealthCare();
         // Query to see all employees
       } else if (answers.option == "View all employees") {
         db.query(`SELECT employees.id, employees.first_name, employees.last_name, roles.job_title, roles.salary, departments.name AS department_name, employees.manager AS employee_manager FROM employees JOIN roles ON roles.id = employees.roles_id JOIN departments ON departments.id = roles.departments_id`, (err, result) => {
@@ -62,7 +63,7 @@ function GEHealthCare() {
           }
           console.table(result)
         })
-        return
+        return GEHealthCare();
         // Query to add a department
       } else if (answers.option == "Add a department") {
         inquirer.prompt([
@@ -137,6 +138,47 @@ function GEHealthCare() {
               })
               return GEHealthCare()
             })
+        })
+      } else if (answers.option == "Add an employee") {
+        db.query(`SELECT id, job_title FROM roles`, (err, results) => {
+          if (err) {
+            console.log(err)
+          }
+
+          const employeeChoices = results.map(emp => ({
+            name: emp.job_title,
+            value: emp.id 
+          }))
+
+          console.log(employeeChoices)
+
+          inquirer.prompt([
+            {
+              type: "input",
+              name: "first_name",
+              message: "What is the employees first name?"
+            },
+            {
+              type: "input",
+              name: "last_name",
+              message: "What is the employees last name?"
+            },
+            {
+              type: "list",
+              name: "roles_id",
+              message: "What is the employees role in the company?",
+              choices: employeeChoices
+            },
+            {
+              type: "input",
+              name: "manager",
+              message: "Who is the employees manager?"
+            }
+          ])
+          .then((answers) => {
+          
+          })
+          
         })
       }
       // console.log("Goodbye!")
