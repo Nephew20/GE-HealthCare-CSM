@@ -65,7 +65,7 @@ function GEHealthCare() {
           console.table(result)
           return GEHealthCare();
         })
-        
+
         // Query to add a department
       } else if (answers.option == "Add a department") {
         inquirer.prompt([
@@ -140,7 +140,7 @@ function GEHealthCare() {
                 console.table(result)
                 return GEHealthCare()
               })
-              
+
             })
         })
       } else if (answers.option == "Add an employee") {
@@ -196,12 +196,34 @@ function GEHealthCare() {
               });
             });
         })
-      } else {
-        console.log("Good Bye!")
-        db.end()
+      } else if (answers.option == "Update an employee role") {
+        db.query(`SELECT id, first_name, last_name FROM employees`, (err, results) => {
+          if (err) {
+            console.log(err);
+          }
+          
+          const employeeName = results.map(emp => ({
+            name: `${emp.first_name} ${emp.last_name}`,
+            value: emp.id
+          }));
+
+          inquirer.prompt([
+            {
+              type: "list",
+              name: "employee",
+              message: "Who's role would you like to update?",
+              choices: employeeName
+            },
+            {
+              type: "input",
+              name: "last_name",
+              message: "Last name please: "
+            }
+          ])
+        })
       }
 
-     
+
 
 
     })
