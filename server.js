@@ -201,25 +201,41 @@ function GEHealthCare() {
           if (err) {
             console.log(err);
           }
-          
+
           const employeeName = results.map(emp => ({
             name: `${emp.first_name} ${emp.last_name}`,
             value: emp.id
           }));
 
-          inquirer.prompt([
-            {
-              type: "list",
-              name: "employee",
-              message: "Who's role would you like to update?",
-              choices: employeeName
-            },
-            {
-              type: "input",
-              name: "last_name",
-              message: "Last name please: "
+          console.log(employeeName)
+
+          db.query(`SELECT id, job_title FROM roles`, (err, results) => {
+            if (err) {
+              console.log(err);
             }
-          ])
+
+            const roleTitle = results.map(role => ({
+              name: role.job_title,
+              value: role.id
+            }));
+
+            inquirer.prompt([
+              {
+                type: "list",
+                name: "employee",
+                message: "Who's role would you like to update?",
+                choices: employeeName
+              },
+              {
+                type: "list",
+                name: "roleTitle",
+                message: "What role would you like for them to have?",
+                choices: roleTitle
+              }
+            ])
+          })
+
+
         })
       }
 
