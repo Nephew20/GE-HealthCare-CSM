@@ -31,7 +31,7 @@ function GEHealthCare() {
           // Your Mysql User
           user: "root",
           // Your Mysql Password
-          password: "12345",
+          password: "",
           database: "ge_db"
         }
       )
@@ -222,17 +222,27 @@ function GEHealthCare() {
             inquirer.prompt([
               {
                 type: "list",
-                name: "employee",
+                name: "employee_id",
                 message: "Who's role would you like to update?",
                 choices: employeeName
               },
               {
                 type: "list",
-                name: "roleTitle",
+                name: "new_role_id",
                 message: "What role would you like for them to have?",
                 choices: roleTitle
               }
             ])
+              .then((answers) => {
+                db.query(`UPDATE employees SET roles_id = ? WHERE = ?`, [answers.new_role_id, answers.employee_id] ,
+                  (err, results) => {
+                    if (err) {
+                      console.log(err);
+                      return;
+                    }
+                  }
+                )
+              })
           })
 
 
