@@ -31,7 +31,7 @@ function GEHealthCare() {
           // Your Mysql User
           user: "root",
           // Your Mysql Password
-          password: "",
+          password: "12345",
           database: "ge_db"
         }
       )
@@ -234,7 +234,7 @@ function GEHealthCare() {
               }
             ])
               .then((answers) => {
-                db.query(`UPDATE employees SET roles_id = ? WHERE = ?`, [answers.new_role_id, answers.employee_id] ,
+                db.query(`UPDATE employees SET roles_id = ? WHERE id = ?`, [answers.new_role_id, answers.employee_id],
                   (err, results) => {
                     if (err) {
                       console.log(err);
@@ -242,16 +242,25 @@ function GEHealthCare() {
                     }
                   }
                 )
+
+                console.log("Employee role has been updated!")
+
+                db.query(`SELECT employees.id, employees.first_name, employees.last_name, roles.job_title FROM employees JOIN roles ON roles.id = employees.roles_id`, (err, results) => {
+                  if (err) {
+                    console.log(err);
+                    return
+                  }
+
+                  console.table(results);
+                  return GEHealthCare();
+                });
               })
           })
-
-
         })
+      } else {
+        console.log("Bye!")
+        return
       }
-
-
-
-
     })
     .catch((error) => {
       if (error.isTtyError) {

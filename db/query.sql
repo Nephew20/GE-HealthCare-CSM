@@ -1,4 +1,2 @@
-SELECT id, first_name, last_name FROM employees;
-SELECT id, job_title FROM roles;
-
-UPDATE employees SET roles_id WHERE
+SELECT employees.id, employees.first_name, employees.last_name, roles.job_title FROM employees 
+JOIN roles ON roles.id = employees.roles_id
