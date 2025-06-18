@@ -31,7 +31,7 @@ function GEHealthCare() {
           // Your Mysql User
           user: "root",
           // Your Mysql Password
-          password: "12345",
+          password: "",
           database: "ge_db"
         }
       )
@@ -259,7 +259,7 @@ function GEHealthCare() {
         })
       } else {
         console.log("Bye!")
-        return
+        process.exit()
       }
     })
     .catch((error) => {
